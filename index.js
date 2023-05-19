@@ -31,14 +31,20 @@ async function run() {
     const db = client.db('ToyHouse');
     const allToyCollection = db.collection('AllToys');
 
-    // send to fata database
+    // send to data database
     app.post("/addToy", async (req, res) => {
       const body = req.body;
       const result = await allToyCollection.insertOne(body);
       res.send(result)
       console.log(result);
 
-    })
+    });
+
+    // server data receive this port
+    app.get("/AllToys", async (req, res) => {
+      const result = await allToyCollection.find({}).toArray();
+      res.send(result);
+    });
 
 
     // Send a ping to confirm a successful connection
