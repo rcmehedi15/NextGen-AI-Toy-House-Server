@@ -41,7 +41,16 @@ async function run() {
     });
 
     // server data receive this port
-    app.get("/AllToys", async (req, res) => {
+    app.get("/AllToys/:text", async (req, res) => {
+      console.log(req.params.text);
+      if(req.params.text == "Men Robotics" || req.params.text == "Women Robotics" || req.params.text == "Kids Robotics")
+      {
+        const result = await allToyCollection
+        .find({subCategory: req.params.text})
+        .toArray();
+        console.log(result);
+        return res.send(result)
+      }
       const result = await allToyCollection.find({}).toArray();
       res.send(result);
     });
