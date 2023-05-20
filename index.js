@@ -31,7 +31,7 @@ async function run() {
     const db = client.db('ToyHouse');
     const allToyCollection = db.collection('AllToys');
 
-    // send to data database
+    // 1. send to data database
     app.post("/addToy", async (req, res) => {
       const body = req.body;
       const result = await allToyCollection.insertOne(body);
@@ -40,25 +40,44 @@ async function run() {
 
     });
 
-    // server data receive this port
+    // 2. server data receive this port
     app.get("/AllToys/:text", async (req, res) => {
       console.log(req.params.text);
-      if(req.params.text == "Men Robotics" || req.params.text == "Women Robotics" || req.params.text == "Kids Robotics")
-      {
+      if (req.params.text == "Men Robotics" || req.params.text == "Women Robotics" || req.params.text == "Kids Robotics") {
         const result = await allToyCollection
-        .find({subCategory: req.params.text})
-        .toArray();
+          .find({ subCategory: req.params.text })
+          .toArray();
         console.log(result);
         return res.send(result)
       }
       const result = await allToyCollection.find({}).toArray();
       res.send(result);
     });
+    //  3. my toy table data show 
+    app.get("/myToys/:email", async (req, res) => {
+      const result = await allToyCollection.find({ sellerEmail: req.params.email }).toArray();
+      res.send(result)
+      console.log(req.params.email);
+    })
 
 
-    // Send a ping to confirm a successful connection
+    // 4. all toys search box 
 
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    const indexKeys = { toyName: 1 };
+    const indexOptions = { name: "toyName" }
+    const result = await allToyCollection.createIndex(indexKeys,indexOptions);
+
+    app.get("/toySearchByTitle/:text", async(req, res) => {
+      const searchText = req.params.text;
+      const result = await allToyCollection.find({ toyName: { $regex: searchText, $options: "i" }}).toArray()
+      res.send(result)
+    })
+
+
+
+      // Send a ping to confirm a successful connection
+
+      console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
