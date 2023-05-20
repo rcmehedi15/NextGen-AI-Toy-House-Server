@@ -54,12 +54,21 @@ async function run() {
       res.send(result);
     });
     //  3. my toy table data show 
-    app.get("/myToys/:email", async (req, res) => {
-      const result = await allToyCollection.find({ sellerEmail: req.params.email }).toArray();
-      res.send(result)
-      console.log(req.params.email);
+    // app.get("/myToys/:email", async (req, res) => {
+    //   const result = await allToyCollection.find({ sellerEmail: req.params.email }).toArray();
+    //   res.send(result)
+    //   // console.log(req.params.email);
+    // })
+    
+    app.get('/myToys', async(req,res) => {
+      console.log(req.query.email);
+      let query = {};
+      if(req.query?.email){
+        query = {sellerEmail: req.query.email}
+      }
+      const result = await allToyCollection.find(query).toArray();
+      res.send(result);
     })
-
 
     // 4. all toys search box 
 
@@ -73,6 +82,13 @@ async function run() {
       res.send(result)
     })
 
+  //  4 delete 
+   app.delete('/myToys:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) }
+    const result = await allToyCollection.deleteOne(query)
+    res.send(result);
+  })
 
 
       // Send a ping to confirm a successful connection
