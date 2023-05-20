@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const { MongoClient, ServerApiVersion, ObjectId} = require('mongodb');
+
 require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
@@ -10,8 +12,6 @@ app.use(express.json());
 
 // connect mongodb
 
-
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@mehedi15.lrak9tg.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -47,18 +47,14 @@ async function run() {
         const result = await allToyCollection
           .find({ subCategory: req.params.text })
           .toArray();
-        console.log(result);
+        // console.log(result);
         return res.send(result)
       }
       const result = await allToyCollection.find({}).toArray();
       res.send(result);
     });
     //  3. my toy table data show 
-    // app.get("/myToys/:email", async (req, res) => {
-    //   const result = await allToyCollection.find({ sellerEmail: req.params.email }).toArray();
-    //   res.send(result)
-    //   // console.log(req.params.email);
-    // })
+  
     
     app.get('/myToys', async(req,res) => {
       console.log(req.query.email);
@@ -82,14 +78,17 @@ async function run() {
       res.send(result)
     })
 
-  //  4 delete 
-   app.delete('/myToys:id', async (req, res) => {
+  //  4 delete data form server
+
+  app.delete('/myToys/:id', async (req, res) => {
+    console.log(req.params.id); 
     const id = req.params.id;
     const query = { _id: new ObjectId(id) }
-    const result = await allToyCollection.deleteOne(query)
+    const result = await allToyCollection.deleteOne(query);
     res.send(result);
-  })
 
+
+})
 
       // Send a ping to confirm a successful connection
 
