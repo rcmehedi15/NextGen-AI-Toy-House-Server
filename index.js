@@ -41,18 +41,18 @@ async function run() {
     });
 
     // find all data 
-    app.get('/toys',async(req,res) => {
-     const limit = parseInt(req.query.limit)
+    app.get('/toys', async (req, res) => {
+      const limit = parseInt(req.query.limit)
       const result = await allToyCollection.find().limit(limit).toArray()
       res.send(result);
     })
-    app.get('/toys/:id',async(req,res) => {
+    app.get('/toys/:id', async (req, res) => {
       console.log(req.params.id);
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await allToyCollection.findOne(query)
       res.send(result)
-      
+
     })
     //  edit data 
     app.put('/toys/:id', async (req, res) => {
@@ -93,11 +93,24 @@ async function run() {
     app.get('/myToys', async (req, res) => {
       console.log(req.query.email);
       let query = {};
+      let sort = {}
       if (req.query?.email) {
-        query = { sellerEmail: req.query.email }
+        const query = { sellerEmail: req.query.email }
+
+        //  const sort = req.query?.sort == 'true' ? 1 : -1;
+        if (req.query?.sort == 'asc') {
+          sort = { Price: 1 }
+        }
+        if (req.query?.sort == 'dac') {
+          sort = { Price: -1 }
+        }
+        const result = await allToyCollection.find(query).sort(sort).toArray();
+        res.send(result);
       }
-      const result = await allToyCollection.find(query).toArray();
-      res.send(result);
+      else {
+        res.status(404).send({ error: true, message: 'Email Not Found' })
+      }
+
     })
 
     // 4. all toys search box 
@@ -123,7 +136,7 @@ async function run() {
 
 
     })
-    
+
 
     // Send a ping to confirm a successful connection
 
